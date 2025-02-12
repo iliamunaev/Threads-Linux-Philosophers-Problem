@@ -19,20 +19,19 @@ typedef enum e_state
 
 typedef struct s_ph
 {
-    size_t          index;         // Philosopher index (not a pointer)
-    pthread_t       tid;           // Thread ID for each philosopher
-    t_state         state;         // Philosopher state
+	size_t          index;
+	pthread_t       tid;
+	t_state         state;
 
-    pthread_mutex_t *fork_l;       // Pointer to left fork
-    pthread_mutex_t *fork_r;       // Pointer to right fork
-
-    uint64_t        last_meal_time; // Use uint64_t for timestamps
+	pthread_mutex_t *fork_l;
+	pthread_mutex_t *fork_r;
+	pthread_mutex_t	death_mutex;
+    uint64_t        last_meal_time;
     long            time_to_die;
     long            time_to_eat;
     long            time_to_sleep;
-    volatile bool   is_dead;        // Ensure correct behavior in threads
-
-    struct s_sim    *sim;          // Pointer to global simulation struct
+    volatile bool   is_dead;
+    struct s_sim    *sim;
 } t_ph;
 
 typedef struct s_sim

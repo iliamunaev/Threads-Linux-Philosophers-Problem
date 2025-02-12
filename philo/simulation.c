@@ -6,16 +6,17 @@
 /*   By: imunaev- <imunaev-@studen.hive.fi>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/12 13:21:59 by imunaev-          #+#    #+#             */
-/*   Updated: 2025/02/12 14:00:49 by imunaev-         ###   ########.fr       */
+/*   Updated: 2025/02/12 14:10:16 by imunaev-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void think(t_ph *ph)
+void	think(t_ph *ph)
 {
-	ph->state = thinking;	
-	print_state(ph->index + 1, "is thinking");
+	ph->state = thinking;
+	
+	print_state(ph, "is thinking");
 	
 	if (is_free_forks(ph))
 	{
@@ -23,24 +24,23 @@ void think(t_ph *ph)
 		take_forks(ph);
 		eat(ph);
 		put_forks(ph);
-	}
-	
+	}	
 }
 
-void sleep(t_ph *ph)
+void	sleep(t_ph *ph)
 {
 	print_state(ph->index + 1, "is sleeping");	
 	usleep(ph->time_to_sleep * 1000);
 }
 
-void eat(t_ph *ph)
+void	eat(t_ph *ph)
 {
 	ph->state = eating;
 	print_state(ph->index + 1, "is eating");
 	usleep(ph->time_to_eat * 1000);
 }
 
-bool is_free_forks(t_ph *ph)
+bool	is_free_forks(t_ph *ph)
 {
     size_t index_l = left(ph);
     size_t index_r = right(ph);
@@ -73,20 +73,10 @@ void *philosopher(void *arg)
             ph->is_dead = true;
             pthread_mutex_unlock(&ph->death_mutex);
             log_action(ph, "has died");
-            return NULL;
+            return ;
         }
         pthread_mutex_unlock(&ph->death_mutex);
-
         think(ph);
-
-        if (is_free_forks(ph))
-        {
-            ph->last_meal_time = get_timestamp();
-            take_forks(ph);
-            eat(ph);
-            put_forks(ph);
-        }
-
         sleep(ph);
         usleep(1000); // Prevent CPU overuse ???
     }
