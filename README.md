@@ -1,0 +1,1 @@
+cc -fsanitize=thread -g
