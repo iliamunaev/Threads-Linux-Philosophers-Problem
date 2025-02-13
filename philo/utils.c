@@ -1,8 +1,5 @@
 #include "philo.h"
 
-/*
-** Simple atol (string->long) implementation.
-*/
 long ft_atol(const char *str)
 {
     long result = 0;
@@ -20,9 +17,6 @@ long ft_atol(const char *str)
     return (sign * result);
 }
 
-/*
-** Print an error message to STDERR.
-*/
 void print_err(char *msg)
 {
     while (*msg)
@@ -30,15 +24,6 @@ void print_err(char *msg)
     write(STDERR_FILENO, "\n", 1);
 }
 
-/*
-** Minimal input validation:
-** Expect:
-**   1) number_of_philosophers
-**   2) time_to_die
-**   3) time_to_eat
-**   4) time_to_sleep
-**   5) [number_of_times_each_philosopher_must_eat] (optional)
-*/
 bool is_input_valid(int ac, char **av)
 {
     if (ac < 5 || ac > 6)
