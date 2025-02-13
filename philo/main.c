@@ -1,23 +1,10 @@
 #include "philo.h"
 
-int main(int ac, char **av)
+static int	create_philo_threads(t_sim *sim, t_ph *ph)
 {
-	t_sim	*sim;
-	t_ph	*ph;
 	long	i;
 	long	j;
 
-	if (!is_input_valid(ac, av))
-		return (EXIT_FAILURE);
-	sim = init_sim(av);
-	if (!sim)
-		return (EXIT_FAILURE);
-	ph = init_ph(sim, av);
-	if (!ph)
-	{
-		cleanup(sim, NULL);
-		return (EXIT_FAILURE);
-	}
 	i = 0;
 	while (i < sim->ph_count)
 	{
@@ -35,15 +22,41 @@ int main(int ac, char **av)
 		}
 		i++;
 	}
+	return (EXIT_SUCCESS);
+}
+
+static void	join_philo_threads(t_sim *sim)
+{
+	long	i;
+
 	i = 0;
 	while (i < sim->ph_count)
 	{
 		if (pthread_join(sim->ph_threads[i], NULL) != 0)
-		{
 			print_err("Error: main() pthread_join failed.");
-		}
 		i++;
 	}
+}
+
+int	main(int ac, char **av)
+{
+	t_sim	*sim;
+	t_ph	*ph;
+
+	if (!is_input_valid(ac, av))
+		return (EXIT_FAILURE);
+	sim = init_sim(av);
+	if (!sim)
+		return (EXIT_FAILURE);
+	ph = init_ph(sim, av);
+	if (!ph)
+	{
+		cleanup(sim, NULL);
+		return (EXIT_FAILURE);
+	}
+	if (create_philo_threads(sim, ph) == EXIT_FAILURE)
+		return (EXIT_FAILURE);
+	join_philo_threads(sim);
 	cleanup(sim, ph);
 	return (EXIT_SUCCESS);
 }

@@ -68,35 +68,37 @@ int	eat(t_ph *ph)
 }
 int go_sleep(t_ph *ph)
 {
-    uint64_t start = get_timestamp();
-    log_action(ph, "is sleeping");
+	uint64_t	start;
 
-    while (get_timestamp() - start < (uint64_t)ph->time_to_sleep)
-    {
-        usleep(1000); // Sleep 1 ms
+	start = get_timestamp();
+	log_action(ph, "is sleeping");
 
-        // Check if philosopher died during sleep
-        pthread_mutex_lock(&ph->sim->last_meal_time_m);
-        uint64_t time_since_meal = get_timestamp() - ph->last_meal_time;
-        pthread_mutex_unlock(&ph->sim->last_meal_time_m);
+	while (get_timestamp() - start < (uint64_t)ph->time_to_sleep)
+	{
+		usleep(1000); // Sleep 1 ms
 
-        if (time_since_meal >= (uint64_t)ph->time_to_die)
-        {
-            pthread_mutex_lock(&ph->sim->is_dead_m);
-            if (!ph->sim->all_dead && !ph->is_dead)
-            {
-                ph->sim->all_dead = true;
-                ph->is_dead = true;
-                pthread_mutex_unlock(&ph->sim->is_dead_m);
+		// Check if philosopher died during sleep
+		pthread_mutex_lock(&ph->sim->last_meal_time_m);
+		uint64_t time_since_meal = get_timestamp() - ph->last_meal_time;
+		pthread_mutex_unlock(&ph->sim->last_meal_time_m);
 
-                log_action(ph, "died");
-                return -1;
-            }
-            pthread_mutex_unlock(&ph->sim->is_dead_m);
-            return -1;
-        }
-    }
-    return 0;
+		if (time_since_meal >= (uint64_t)ph->time_to_die)
+		{
+			pthread_mutex_lock(&ph->sim->is_dead_m);
+			if (!ph->sim->all_dead && !ph->is_dead)
+			{
+				ph->sim->all_dead = true;
+				ph->is_dead = true;
+				pthread_mutex_unlock(&ph->sim->is_dead_m);
+
+				log_action(ph, "died");
+				return -1;
+			}
+			pthread_mutex_unlock(&ph->sim->is_dead_m);
+			return -1;
+		}
+	}
+	return 0;
 }
 
 

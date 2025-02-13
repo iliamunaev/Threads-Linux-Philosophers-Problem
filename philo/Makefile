@@ -6,7 +6,7 @@
 #    By: imunaev- <imunaev-@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/02/11 13:33:12 by imunaev-          #+#    #+#              #
-#    Updated: 2025/02/13 18:16:55 by imunaev-         ###   ########.fr        #
+#    Updated: 2025/02/14 00:29:51 by imunaev-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,7 @@ NAME = philo
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -pthread
 
-SRC = main.c philosopher.c utils.c  init.c
+SRC = main.c philosopher.c utils.c  init_sim.c init_ph.c
 OBJ = $(SRC:.c=.o)
 
 all: $(NAME)
