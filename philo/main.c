@@ -1,145 +1,165 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: imunaev- <imunaev-@studen.hive.fi>         +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/11 13:37:17 by imunaev-          #+#    #+#             */
-/*   Updated: 2025/02/12 13:20:30 by imunaev-         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #include "philo.h"
 
-void	log_action(t_philo *philo, const char *action)
+t_sim	*init_sim(char **av)
 {
-	pthread_mutex_lock(&philo->sim->log_mutex);
-	printf("%ldms Philosopher %u %s\n", get_timestamp(), philo->index, action);
-	pthread_mutex_unlock(&philo->sim->log_mutex);
-}
-
-
-
-
-int	*init_threads(t_phls *phls, size_t p)
-{
-	while (phls->id < p)
-	{
-		if (pthread_create(phls->id, NULL, simulation, phls->id) != 0)
-			return (EXIT_FAILURE);
-		phls->id++;
-	}
-	return (EXIT_SUCCESS);
-}
-
-t_phls	*init_phls(size_t p)
-{
-	t_phls	*phls;
-
-	phls = malloc(p * sizeof(t_phls));
-	if(!phls)
-	{
-		printf("Error:  init_phls() malloc fail.\n");
-		return (NULL);
-	}
-	return (phls);
-}
-
-int	init_mutex(t_phls *phls)
-{
-	int	i;
-
-	while(i < phls->id)
-	{
-		if(pthread_mutex_init(phls->fork, NULL) != 0)
-			return (EXIT_FAILURE);
-		i++;
-	}
-	return (EXIT_SUCCESS);
-}
-
-
-
-void	simulation(void *arg)
-{
-	size_t	i;
 	t_sim	*sim;
 
-	i = (size_t)arg;	
-	sim = init_simulation(i);
+	sim = malloc(sizeof(t_sim));
 	if (!sim)
 	{
-		// err msg
-		// stop simulation
-		return ;
+		print_err("Error: init_sim() malloc sim struct failed.");
+		return (NULL);
 	}
-
-	while (1)
+	sim->ph_count = ft_atol(av[1]);
+	sim->all_dead = false;
+	sim->ph_threads = malloc(sim->ph_count * sizeof(pthread_t));
+	if (!sim->ph_threads)
 	{
-		think(sim, i);
-		
-		if(is_free_forks(sim, i))
-		{
-			take_forks(sim, i);
-			eat(sim, i);
-			put_forks(sim, i);			
-		}
-		
-		sleep(sim, i);
+		for (long i = 0; i < sim->ph_count; i++)
+			pthread_mutex_destroy(&sim->forks_m[i]);
+
+		free(sim->ph_threads);
+		free(sim->forks_m);
+		free(sim);
+
+		print_err("Error: init_sim() malloc ph_threads failed.");
+		return (NULL);
 	}
+	pthread_mutex_init(&sim->is_dead_m, NULL);
+	pthread_mutex_init(&sim->log_m, NULL);
+
+	pthread_mutex_init(&sim->last_meal_time_m, NULL);
+	pthread_mutex_init(&sim->time_to_die_m, NULL);
+	pthread_mutex_init(&sim->time_to_eat_m, NULL);
+	pthread_mutex_init(&sim->time_to_sleep_m, NULL);
+	pthread_mutex_init(&sim->number_must_eat_m, NULL);
+
+
+
+	sim->forks_m= malloc(sim->ph_count * sizeof(pthread_mutex_t));
+	if (!sim->forks_m)
+	{
+		free (sim->ph_threads);
+		free (sim);
+		print_err("Error: init_sim() malloc ph_threads failed.");
+		return (NULL);
+	}
+	for (long i = 0; i < sim->ph_count; i++)
+    {
+        if (pthread_mutex_init(&sim->forks_m[i], NULL) != 0)
+        {
+            print_err("Error: Failed to initialize fork mutex.");
+            return NULL;
+        }
+    }
+	return (sim);
+}
+t_ph *init_ph(t_sim *sim, char **av)
+{
+	long	ph_count;
+	t_ph	*ph;
+	long	i;
+
+	ph_count = ft_atol(av[1]);
+	ph = malloc(ph_count * sizeof(t_ph));
+	if (!ph)
+	{
+		print_err("Error: init_ph() malloc failed.");
+		return NULL;
+	}
+	i = 0;
+	while (i < ph_count)
+	{
+		ph[i].sim = sim;
+		ph[i].index = i;
+		ph[i].last_meal_time = get_timestamp();
+		ph[i].time_to_die = ft_atol(av[2]);
+		ph[i].time_to_eat = ft_atol(av[3]);
+		ph[i].time_to_sleep = ft_atol(av[4]);
+		ph[i].number_must_eat = av[5] ? ft_atol(av[5]) : -1;
+		ph[i].is_dead = false;
+		i++;
+	}
+	return (ph);
 }
 
-int	main(int ac, char **av)
+void cleanup(t_sim *sim, t_ph *ph)
 {
+    if (!sim)
+        return;
+
+    // Destroy mutexes
+    pthread_mutex_destroy(&sim->is_dead_m);
+    pthread_mutex_destroy(&sim->log_m);
+    pthread_mutex_destroy(&sim->last_meal_time_m);
+    pthread_mutex_destroy(&sim->time_to_die_m);
+    pthread_mutex_destroy(&sim->time_to_eat_m);
+    pthread_mutex_destroy(&sim->time_to_sleep_m);
+    pthread_mutex_destroy(&sim->number_must_eat_m);
+
+    for (long i = 0; i < sim->ph_count; i++)
+        pthread_mutex_destroy(&sim->forks_m[i]);
+
+    // Free dynamically allocated memory
+    if (sim->forks_m)
+        free(sim->forks_m);
+    if (sim->ph_threads)
+        free(sim->ph_threads);
+    if (ph)
+        free(ph);
+    free(sim);
+}
+
+int main(int ac, char **av)
+{
+	(void)ac;
 	// if (!is_input_valid(ac, av))
-	// {
 	// 	return (EXIT_FAILURE);
-	// }
 
-	simulation();
-	
+	t_sim	*sim;
+	t_ph	*ph;
 
-    memset(state, thinking, sizeof(t_state));
-
-
-	// alloc memory for phils structures
-	t_philo	*phls;
-	phls = init_phls(p);
-	if (!phls)
+	sim = init_sim(av);
+	if(!sim)
 	{
-		// do smth
+		print_err("Error: main() init sim failed.");
+		return (EXIT_FAILURE);
+	}
+	ph = init_ph(sim, av);
+	if (!ph)
+	{
+		free(sim->ph_threads);
+		free(sim->forks_m);
+		free(sim);
+		print_err("Error: main() init ph failed.");
 		return (EXIT_FAILURE);
 	}
 
-	// start threads
-	pthread_t	*threads;
-	threads = init_threads(phls, p);
-	if (threads != 0)
+	long i = 0;
+	while (i < sim->ph_count)
 	{
-		// do smth
-		return (EXIT_FAILURE);
-	}
-
-	// start mutex
-	pthread_mutex_t	*mutex;
-	mutex = init_mutex(phls);
-	if (mutex != EXIT_SUCCESS)
-	{
-		// do smth
-		return (EXIT_FAILURE);
-	}
-
-
-	//starts a new threads in the calling process
-
-	i = 0;
-	while (i < t)
-	{
-		if (pthread_join(&threads[i], NULL) != 0)
+		ph[i].index = i;
+		if (pthread_create(&sim->ph_threads[i], NULL, &philosopher, &ph[i]) != 0)
+		{
+			print_err("Error: main() pthread_create philosopher failed.");
+			// free all
 			return (EXIT_FAILURE);
+		}
+		i++;
+	}
+	i = 0;
+	while (i < sim->ph_count)
+	{
+		if (pthread_join(sim->ph_threads[i], NULL) != 0)
+		{
+			print_err("Error: main() pthread_join failed.");
+			return (EXIT_FAILURE);
+		}
 		i++;
 	}
 
+	cleanup(sim, ph);
 	return (EXIT_SUCCESS);
 }
+
