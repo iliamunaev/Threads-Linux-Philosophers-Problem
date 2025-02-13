@@ -58,21 +58,19 @@ void put_forks(t_ph *ph)
 void eat(t_ph *ph)
 {
     int forks = take_forks(ph);
+    if (forks == -1)
+        return;
 
-    if (forks != -1)
-    {
-        log_action(ph, "is eating");
+    log_action(ph, "is eating");
 
-        pthread_mutex_lock(&ph->sim->is_dead_m);
-        ph->last_meal_time = get_timestamp();
-        pthread_mutex_unlock(&ph->sim->is_dead_m);
+    pthread_mutex_lock(&ph->sim->last_meal_time_m);  // Use the same mutex
+    ph->last_meal_time = get_timestamp();
+    pthread_mutex_unlock(&ph->sim->last_meal_time_m);
 
-        usleep(ph->time_to_eat * 1000);
-
-        // ✅ Ensure forks are released after eating
-        put_forks(ph);
-    }
+    usleep(ph->time_to_eat * 1000);
+    put_forks(ph);
 }
+
 
 void go_sleep(t_ph *ph)
 {
