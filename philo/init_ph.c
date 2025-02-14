@@ -8,10 +8,6 @@ static void	fill_ph_data(t_ph *p, t_sim *sim, char **av, long i)
 	p->time_to_die = ft_atol(av[2]);
 	p->time_to_eat = ft_atol(av[3]);
 	p->time_to_sleep = ft_atol(av[4]);
-	if (av[5])
-		p->number_must_eat = ft_atol(av[5]);
-	else
-		p->number_must_eat = -1;
 	p->is_dead = false;
 }
 

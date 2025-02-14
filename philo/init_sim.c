@@ -34,6 +34,8 @@ static t_sim	*alloc_sim_struct(char **av)
 	sim->all_dead = false;
 	sim->forks_m = NULL;
 	sim->ph_threads = NULL;
+	sim->number_must_eat = 0;
+	sim->meals_eaten = NULL;
 	return (sim);
 }
 
@@ -95,7 +97,7 @@ static int	init_meals_mutexes(t_sim *sim)
 	}
 	return (0);
 }
-static int	alloc_forks_and_threads(t_sim *sim)
+static int	alloc_forks_threads_meals(t_sim *sim)
 {
 	sim->forks_m = malloc(sim->ph_count * sizeof(pthread_mutex_t));
 	if (!sim->forks_m)
@@ -123,17 +125,36 @@ static int	alloc_forks_and_threads(t_sim *sim)
 	}
 	return (0);
 }
-void	desroy_fork_mutexes(t_sim *sim)
+void	desroy_mutexes(t_sim *sim, pthread_mutex_t *mutexes)
 {
 	long	i;
 
 	i = 0;
 	while(i < sim->ph_count)
 	{
-		pthread_mutex_destroy(&sim->meals_eaten_m[i]);
+		pthread_mutex_destroy(&mutexes[i]);
 		i++;
 	}
 }
+
+static int 	alloc_meals_eaten_arr(t_sim *sim, char **av)
+{
+	long	i;
+	long	meals;
+
+	i = 0;
+	meals = ft_atol(av[5]);
+	sim->meals_eaten = malloc(meals * sizeof(long));
+	if (!sim->meals_eaten)
+		return (-1);
+	while (i < meals)
+	{
+		sim->meals_eaten[i] = meals;
+		i++;
+	}
+	return (0);
+}
+
 
 t_sim	*init_sim(char **av)
 {
@@ -147,12 +168,15 @@ t_sim	*init_sim(char **av)
 		free(sim);
 		return (NULL);
 	}
-	if (alloc_meals_eaten_arr(sim) < 0)
+	if (av[5])
 	{
-		// free alloc_forks_threads_meals
-		free_init_fail(sim);
-		free(sim);
-		return (NULL);
+		if (alloc_meals_eaten_arr(sim, av) < 0)
+		{
+			// free alloc_forks_threads_meals
+			free_init_fail(sim);
+			free(sim);
+			return (NULL);
+		}
 	}
 	if (init_main_mutexes(sim) < 0)
 	{
@@ -165,18 +189,18 @@ t_sim	*init_sim(char **av)
 		pthread_mutex_destroy(&sim->log_m);
 		pthread_mutex_destroy(&sim->last_meal_time_m);
 		pthread_mutex_destroy(&sim->number_must_eat_m);
-		pthread_mutex_destroy(&sim->meals_eaten_m);
+		desroy_mutexes(sim, sim->meals_eaten_m);
+
 		free_init_fail(sim);
 		return (NULL);
 	}
 	if (init_meals_mutexes(sim) < 0)
 	{
-		desroy_fork_mutexes(sim->forks_m);
+		desroy_mutexes(sim, sim->forks_m);
 		pthread_mutex_destroy(&sim->is_dead_m);
 		pthread_mutex_destroy(&sim->log_m);
 		pthread_mutex_destroy(&sim->last_meal_time_m);
 		pthread_mutex_destroy(&sim->number_must_eat_m);
-		pthread_mutex_destroy(&sim->meals_eaten_m);
 		free_init_fail(sim);
 		return (NULL);
 	}

@@ -59,6 +59,14 @@ int	eat(t_ph *ph)
 	ph->last_meal_time = get_timestamp();
 	pthread_mutex_unlock(&ph->sim->last_meal_time_m);
 	log_action(ph, "is eating");
+
+	if (ph->sim->number_must_eat > 0)  /// only positive?? or null also
+	{
+		pthread_mutex_lock(&ph->sim->meals_eaten_m[ph->index]);
+		ph->sim->meals_eaten[ph->index]--;
+		pthread_mutex_unlock(&ph->sim->meals_eaten_m[ph->index]);
+	}
+
 	usleep(ph->time_to_eat * 1000);
 	pthread_mutex_lock(&ph->sim->last_meal_time_m);
 	ph->last_meal_time = get_timestamp();
@@ -101,6 +109,17 @@ int go_sleep(t_ph *ph)
 	return 0;
 }
 
+bool	is_all_meals_eaten(t_sim *sim)
+{
+	long	i;
+	i = 0;
+	while(i < sim->number_must_eat)
+	{
+		if(sim->meals_eaten[i] != 0)
+			return (false);
+	}
+	return (true);
+}
 
 void	*philosopher(void *arg)
 {
@@ -142,6 +161,10 @@ void	*philosopher(void *arg)
 				log_action(ph, "died");
 			}
 			pthread_mutex_unlock(&ph->sim->is_dead_m);
+			return (NULL);
+		}
+		if((ph->sim->number_must_eat > 0) && is_all_meals_eaten(ph->sim))
+		{
 			return (NULL);
 		}
 		if(go_sleep(ph) == -1)

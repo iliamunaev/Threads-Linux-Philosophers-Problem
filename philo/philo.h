@@ -6,7 +6,7 @@
 /*   By: imunaev- <imunaev-@studen.hive.fi>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 00:04:08 by imunaev-          #+#    #+#             */
-/*   Updated: 2025/02/14 10:50:07 by imunaev-         ###   ########.fr       */
+/*   Updated: 2025/02/14 15:27:52 by imunaev-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ typedef struct s_sim
 	long			ph_count;
 	bool			all_dead;
 	long			*meals_eaten;
+	long			number_must_eat;
 	pthread_t		*ph_threads;
 	pthread_mutex_t last_meal_time_m;
 	pthread_mutex_t number_must_eat_m;
@@ -42,7 +43,6 @@ typedef struct s_ph
 	long		time_to_die;
 	long		time_to_eat;
 	long		time_to_sleep;
-	long		number_must_eat;
 	bool		is_dead;
 	t_sim		*sim;
 }	t_ph;
