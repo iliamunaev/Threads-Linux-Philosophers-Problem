@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imunaev- <imunaev-@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: imunaev- <imunaev-@studen.hive.fi>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 00:04:08 by imunaev-          #+#    #+#             */
-/*   Updated: 2025/02/14 00:04:09 by imunaev-         ###   ########.fr       */
+/*   Updated: 2025/02/14 10:50:07 by imunaev-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,12 +25,14 @@ typedef struct s_sim
 {
 	long			ph_count;
 	bool			all_dead;
+	long			*meals_eaten;
 	pthread_t		*ph_threads;
 	pthread_mutex_t last_meal_time_m;
 	pthread_mutex_t number_must_eat_m;
 	pthread_mutex_t is_dead_m;
 	pthread_mutex_t log_m;
 	pthread_mutex_t *forks_m;
+	pthread_mutex_t *meals_eaten_m;
 }	t_sim;
 
 typedef struct s_ph

@@ -96,10 +96,18 @@ void	cleanup(t_sim *sim, t_ph *ph)
 		pthread_mutex_destroy(&sim->forks_m[i]);
 		i++;
 	}
+	i = 0;
+	while (i < sim->ph_count)
+	{
+		pthread_mutex_destroy(&sim->meals_eaten_m[i]);
+		i++;
+	}	
 	if (sim->forks_m)
 		free(sim->forks_m);
 	if (sim->ph_threads)
 		free(sim->ph_threads);
+	if (sim->meals_eaten)
+		free(sim->meals_eaten);
 	if (ph)
 		free(ph);
 	free(sim);
