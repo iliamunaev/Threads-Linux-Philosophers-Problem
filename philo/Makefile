@@ -6,7 +6,7 @@
 #    By: imunaev- <imunaev-@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/02/11 13:33:12 by imunaev-          #+#    #+#              #
-#    Updated: 2025/02/14 00:29:51 by imunaev-         ###   ########.fr        #
+#    Updated: 2025/02/19 17:31:13 by imunaev-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,8 +15,9 @@ NAME = philo
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -pthread
 
-SRC = main.c philosopher.c utils.c  init_sim.c init_ph.c
-OBJ = $(SRC:.c=.o)
+SRC = $(wildcard *.c)
+OBJ_DIR = obj
+OBJ = $(patsubst %.c,$(OBJ_DIR)/%.o,$(SRC))
 
 all: $(NAME)
 
@@ -26,11 +27,14 @@ $(NAME): $(OBJ)
 debug: CFLAGS += -fsanitize=thread -g
 debug: re
 
-%.o: %.c philo.h
+$(OBJ_DIR)/%.o: %.c philo.h | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)
+
 clean:
-	rm -f $(OBJ)
+	rm -rf $(OBJ_DIR)
 
 fclean: clean
 	rm -f $(NAME)

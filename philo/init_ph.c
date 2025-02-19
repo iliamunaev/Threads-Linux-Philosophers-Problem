@@ -1,18 +1,27 @@
 #include "philo.h"
 
-static void	fill_ph_data(t_ph *p, t_sim *sim, char **av, long i)
+static int	fill_ph_data(t_ph *ph, t_sim *sim, char **av, long i)
 {
-	p->sim = sim;
-	p->index = i;
-	p->last_meal_time = get_timestamp();
-	p->time_to_die = ft_atol(av[2]);
-	p->time_to_eat = ft_atol(av[3]);
-	p->time_to_sleep = ft_atol(av[4]);
+	uint64_t	time;
+
+	ph->sim = sim;
+	ph->index = i;
+	time = get_timestamp();
+	if (time == 0)
+	{
+		print_err("Error: init_ph() get_timestamp failed.");
+		return (EXIT_FAILURE);
+	}
+	ph->last_meal_time = time;
+	ph->time_to_die = ft_atol(av[2]);
+	ph->time_to_eat = ft_atol(av[3]);
+	ph->time_to_sleep = ft_atol(av[4]);
 	if (av[5])
-		p->number_must_eat = ft_atol(av[5]);
+		ph->num_meals_to_eat = ft_atol(av[5]);
 	else
-		p->number_must_eat = -1;
-	p->is_dead = false;
+		ph->num_meals_to_eat = -1;
+	ph->is_dead = false;
+	return (EXIT_SUCCESS);
 }
 
 t_ph	*init_ph(t_sim *sim, char **av)
@@ -31,7 +40,11 @@ t_ph	*init_ph(t_sim *sim, char **av)
 	i = 0;
 	while (i < ph_count)
 	{
-		fill_ph_data(&ph[i], sim, av, i);
+		if (fill_ph_data(&ph[i], sim, av, i) == EXIT_FAILURE)
+		{
+			print_err("Error: init_ph() fill data failed.");
+			return (NULL);
+		}
 		i++;
 	}
 	return (ph);

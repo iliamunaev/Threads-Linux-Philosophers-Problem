@@ -14,10 +14,10 @@ static int	create_philo_threads(t_sim *sim, t_ph *ph)
 			j = 0;
 			while (j < i)
 			{
-				pthread_join(sim->ph_threads[j], NULL);
+				if (pthread_join(sim->ph_threads[j], NULL) != 0)
+					return (EXIT_FAILURE);
 				j++;
 			}
-			cleanup(sim, ph);
 			return (EXIT_FAILURE);
 		}
 		i++;
@@ -25,7 +25,7 @@ static int	create_philo_threads(t_sim *sim, t_ph *ph)
 	return (EXIT_SUCCESS);
 }
 
-static void	join_philo_threads(t_sim *sim)
+static int	join_philo_threads(t_sim *sim)
 {
 	long	i;
 
@@ -33,9 +33,13 @@ static void	join_philo_threads(t_sim *sim)
 	while (i < sim->ph_count)
 	{
 		if (pthread_join(sim->ph_threads[i], NULL) != 0)
+		{
 			print_err("Error: main() pthread_join failed.");
+			return (EXIT_FAILURE);
+		}
 		i++;
 	}
+	return (EXIT_SUCCESS);
 }
 
 int	main(int ac, char **av)
@@ -47,16 +51,13 @@ int	main(int ac, char **av)
 		return (EXIT_FAILURE);
 	sim = init_sim(av);
 	if (!sim)
-		return (EXIT_FAILURE);
+		cleanup_exit(&sim, NULL, EXIT_FAILURE);
 	ph = init_ph(sim, av);
 	if (!ph)
-	{
-		cleanup(sim, NULL);
-		return (EXIT_FAILURE);
-	}
+		cleanup_exit(&sim, NULL, EXIT_FAILURE);
 	if (create_philo_threads(sim, ph) == EXIT_FAILURE)
-		return (EXIT_FAILURE);
-	join_philo_threads(sim);
-	cleanup(sim, ph);
-	return (EXIT_SUCCESS);
+		cleanup_exit(&sim, &ph, EXIT_FAILURE);
+	if (join_philo_threads(sim) == EXIT_FAILURE)
+		cleanup_exit(&sim, &ph, EXIT_FAILURE);
+	cleanup_exit(&sim, &ph, EXIT_SUCCESS);
 }

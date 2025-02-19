@@ -34,7 +34,7 @@ bool	is_input_valid(int ac, char **av)
 
 	if (ac < 5 || ac > 6)
 	{
-		print_err("Usage: ./philo nb_philo t_die t_eat t_sleep [nb_must_eat]");
+		print_err("Usage: ./philo num_philos time_to_die time_for_eat time_for_sleep [num_meals_to_eat]");
 		return (false);
 	}
 	i = 1;
@@ -65,9 +65,9 @@ void	log_action(t_ph *ph, const char *msg)
 	uint64_t	time;
 
 	time = get_timestamp();
-	pthread_mutex_lock(&ph->sim->log_m);
+	pthread_mutex_lock(&ph->sim->mtx_log);
 	printf("%llu %zu %s\n", (unsigned long long)time, ph->index + 1, msg);
-	pthread_mutex_unlock(&ph->sim->log_m);
+	pthread_mutex_unlock(&ph->sim->mtx_log);
 }
 
 size_t	left(t_ph *ph)
@@ -78,29 +78,4 @@ size_t	left(t_ph *ph)
 size_t	right(t_ph *ph)
 {
 	return ((ph->index + 1) % ph->sim->ph_count);
-}
-
-void	cleanup(t_sim *sim, t_ph *ph)
-{
-	long i;
-
-	if (!sim)
-		return ;
-	pthread_mutex_destroy(&sim->is_dead_m);
-	pthread_mutex_destroy(&sim->log_m);
-	pthread_mutex_destroy(&sim->last_meal_time_m);
-	pthread_mutex_destroy(&sim->number_must_eat_m);
-	i = 0;
-	while (i < sim->ph_count)
-	{
-		pthread_mutex_destroy(&sim->forks_m[i]);
-		i++;
-	}
-	if (sim->forks_m)
-		free(sim->forks_m);
-	if (sim->ph_threads)
-		free(sim->ph_threads);
-	if (ph)
-		free(ph);
-	free(sim);
 }
