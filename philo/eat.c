@@ -7,11 +7,8 @@ int	eat(t_ph *ph)
 
 	if (take_forks(ph) == -1)
 		return (-1);
-
 	log_action(ph, "is eating");
-
 	start = get_timestamp();
-
 	while (get_timestamp() - start < (uint64_t)ph->time_to_eat)
 	{
 		usleep(1000);

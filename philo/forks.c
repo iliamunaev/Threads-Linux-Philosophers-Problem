@@ -33,7 +33,6 @@ static int	take_forks_even(t_ph *ph)
 
 static int	take_forks_odd(t_ph *ph)
 {
-	usleep(500);
 	if (!lock_fork(&ph->sim->mtx_forks[right(ph)], ph))
 		return (0);
 	if (!lock_fork(&ph->sim->mtx_forks[left(ph)], ph))
@@ -58,6 +57,7 @@ int	take_forks(t_ph *ph)
 	}
 	else
 	{
+		think(ph);
 		if (!take_forks_odd(ph))
 			return (0);
 	}
