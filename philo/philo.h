@@ -6,7 +6,7 @@
 /*   By: imunaev- <imunaev-@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 00:04:08 by imunaev-          #+#    #+#             */
-/*   Updated: 2025/02/20 21:38:22 by imunaev-         ###   ########.fr       */
+/*   Updated: 2025/02/20 23:41:25 by imunaev-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,6 @@ typedef struct s_ph
 }	t_ph;
 
 bool		is_input_valid(int ac, char **av);
-int			ft_atol(const char *str);
 void		print_err(char *msg);
 void		*philo(void *arg);
 void		think(t_ph *ph);
@@ -69,5 +68,9 @@ int			eat(t_ph *ph);
 void		put_forks(t_ph *ph);
 int			take_forks(t_ph *ph);
 void		*superviser(void *arg);
+int			ft_atoi(const char *str);
+int			alloc_forks_and_threads(t_sim *sim);
+int			init_main_mutexes(t_sim *sim);
+int			init_fork_mutexes(t_sim *sim);
 
 #endif // PHILO_H

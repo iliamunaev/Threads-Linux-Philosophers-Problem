@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   forks.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: imunaev- <imunaev-@student.hive.fi>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/20 23:13:39 by imunaev-          #+#    #+#             */
+/*   Updated: 2025/02/20 23:17:37 by imunaev-         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
 static int	take_single_fork(t_ph *ph)
@@ -19,38 +31,58 @@ static int	take_single_fork(t_ph *ph)
 	return (-1);
 }
 
-int take_forks(t_ph *ph)
+static int	get_lower_fork_id(t_ph *ph)
 {
+	int	l;
+	int	r;
+
+	l = left(ph);
+	r = right(ph);
+	if (l < r)
+		return (l);
+	return (r);
+}
+
+static int	get_higher_fork_id(t_ph *ph)
+{
+	int	l;
+	int	r;
+
+	l = left(ph);
+	r = right(ph);
+	if (l > r)
+		return (l);
+	return (r);
+}
+
+int	take_forks(t_ph *ph)
+{
+	int	fork1;
+	int	fork2;
+
 	if (ph->sim->ph_count == 1)
 		return (take_single_fork(ph));
-	if (ph->index % 2 == 0)
-		usleep(1000);
-	pthread_mutex_lock(&ph->sim->mtx_forks[left(ph)]);
+	fork1 = get_lower_fork_id(ph);
+	fork2 = get_higher_fork_id(ph);
+	pthread_mutex_lock(&ph->sim->mtx_forks[fork1]);
 	log_action(ph, "has taken a fork");
-	pthread_mutex_lock(&ph->sim->mtx_forks[right(ph)]);
+	pthread_mutex_lock(&ph->sim->mtx_forks[fork2]);
 	log_action(ph, "has taken a fork");
 	return (0);
 }
 
-
-void put_forks(t_ph *ph)
+void	put_forks(t_ph *ph)
 {
-	int	left_id;
-	int	right_id;
+	int	fork1;
+	int	fork2;
 
 	if (ph->sim->ph_count == 1)
 	{
 		pthread_mutex_unlock(&ph->sim->mtx_forks[ph->index]);
 		return ;
 	}
-	left_id = left(ph);
-	right_id = right(ph);
-	if (left_id > right_id)
-	{
-		int tmp = left_id;
-		left_id = right_id;
-		right_id = tmp;
-	}
-	pthread_mutex_unlock(&ph->sim->mtx_forks[right_id]);
-	pthread_mutex_unlock(&ph->sim->mtx_forks[left_id]);
+	fork1 = get_lower_fork_id(ph);
+	fork2 = get_higher_fork_id(ph);
+	pthread_mutex_unlock(&ph->sim->mtx_forks[fork2]);
+	pthread_mutex_unlock(&ph->sim->mtx_forks[fork1]);
 }

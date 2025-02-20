@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: imunaev- <imunaev-@student.hive.fi>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/20 23:19:47 by imunaev-          #+#    #+#             */
+/*   Updated: 2025/02/20 23:56:25 by imunaev-         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
 static int	create_philo_threads(t_sim *sim, t_ph *ph)
@@ -32,20 +44,15 @@ static int	join_philo_threads(t_sim *sim)
 	i = 0;
 	while (i < sim->ph_count)
 	{
-		// printf("[DEBUG] Joining philosopher thread %d...\n", i + 1);
 		if (pthread_join(sim->ph_threads[i], NULL) != 0)
 		{
 			print_err("Error: main() pthread_join failed.");
 			return (EXIT_FAILURE);
 		}
-		// printf("[DEBUG] join_philo_threads() Philosopher thread %d joined successfully.\n", i + 1);
 		i++;
 	}
-	// printf("[DEBUG] join_philo_threads() ALL success Philosopher exit successfully.\n");
-
 	return (EXIT_SUCCESS);
 }
-
 
 int	main(int ac, char **av)
 {
@@ -56,7 +63,7 @@ int	main(int ac, char **av)
 		return (EXIT_FAILURE);
 	sim = init_sim(av);
 	if (!sim)
-		cleanup_exit(&sim, NULL, EXIT_FAILURE);
+		exit(EXIT_FAILURE);
 	ph = init_ph(sim, av);
 	if (!ph)
 		cleanup_exit(&sim, NULL, EXIT_FAILURE);
