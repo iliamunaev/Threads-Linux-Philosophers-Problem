@@ -6,7 +6,7 @@
 #    By: imunaev- <imunaev-@studen.hive.fi>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/02/11 13:33:12 by imunaev-          #+#    #+#              #
-#    Updated: 2025/02/20 09:56:00 by imunaev-         ###   ########.fr        #
+#    Updated: 2025/02/20 15:10:29 by imunaev-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,6 @@ all: $(NAME)
 $(NAME): $(OBJ)
 	$(CC) $(CFLAGS) -o $(NAME) $(OBJ)
 
-#debug: CFLAGS += -fsanitize=thread -g
 debug: CFLAGS += -g
 debug: re
 

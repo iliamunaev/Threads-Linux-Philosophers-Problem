@@ -48,7 +48,7 @@ int	take_forks(t_ph *ph)
 	if (ph->sim->ph_count == 1)
 	{
 		take_single_fork(ph);
-		return (check_death_during_action(ph));
+		return (check_death_during_action(ph));		
 	}
 	if (ph->index % 2 == 0)
 	{
@@ -69,8 +69,17 @@ void	put_forks(t_ph *ph)
 	if (ph->sim->ph_count == 1)
 	{
 		pthread_mutex_unlock(&ph->sim->mtx_forks[left(ph)]);
-		return ;
+		return;
 	}
-	pthread_mutex_unlock(&ph->sim->mtx_forks[left(ph)]);
-	pthread_mutex_unlock(&ph->sim->mtx_forks[right(ph)]);
+	if (ph->index % 2 == 0)
+	{
+		pthread_mutex_unlock(&ph->sim->mtx_forks[right(ph)]);
+		pthread_mutex_unlock(&ph->sim->mtx_forks[left(ph)]);
+	}
+	else
+	{
+		pthread_mutex_unlock(&ph->sim->mtx_forks[left(ph)]);
+		pthread_mutex_unlock(&ph->sim->mtx_forks[right(ph)]);
+	}
 }
+

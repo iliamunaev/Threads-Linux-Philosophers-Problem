@@ -8,6 +8,8 @@ static void	destroy_mutexes(t_sim *sim)
 		return ;
 	if (pthread_mutex_destroy(&sim->mtx_last_meal_time) != 0)
 		return ;
+	if (pthread_mutex_destroy(&sim->mtx_meal_count) != 0)
+		return ;
 }
 
 static void	destroy_forks(t_sim *sim)

@@ -6,7 +6,7 @@
 /*   By: imunaev- <imunaev-@studen.hive.fi>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 00:04:08 by imunaev-          #+#    #+#             */
-/*   Updated: 2025/02/20 13:45:08 by imunaev-         ###   ########.fr       */
+/*   Updated: 2025/02/20 14:52:53 by imunaev-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,11 +25,16 @@ typedef struct s_sim
 {
 	long			ph_count;
 	bool			all_dead;
+	bool			all_satiated;
+	long			num_meals_to_eat;
+	long			*meal_count;
 	pthread_t		*ph_threads;
+	pthread_t		monitor_thread;
 	pthread_mutex_t	*mtx_forks;
 	pthread_mutex_t	mtx_is_dead;
 	pthread_mutex_t	mtx_log;
 	pthread_mutex_t	mtx_last_meal_time;
+	pthread_mutex_t	mtx_meal_count;    
 }	t_sim;
 
 typedef struct s_ph
@@ -39,7 +44,6 @@ typedef struct s_ph
 	long		time_to_die;
 	long		time_to_eat;
 	long		time_to_sleep;
-	long		num_meals_to_eat;
 	bool		is_dead;
 	t_sim		*sim;
 }	t_ph;
@@ -64,5 +68,6 @@ int			go_sleep(t_ph *ph);
 int			eat(t_ph *ph);
 void		put_forks(t_ph *ph);
 int			take_forks(t_ph *ph);
+void		*superviser(void *arg);
 
 #endif // PHILO_H
