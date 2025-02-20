@@ -47,8 +47,10 @@ static int	take_forks_odd(t_ph *ph)
 int	take_forks(t_ph *ph)
 {
 	if (ph->sim->ph_count == 1)
-		return take_single_fork(ph);
-
+	{
+		take_single_fork(ph);
+		return (check_death_during_action(ph));
+	}
 	if (ph->index % 2 == 0)
 	{
 		if (!take_forks_even(ph))

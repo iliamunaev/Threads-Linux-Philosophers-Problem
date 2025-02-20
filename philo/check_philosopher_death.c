@@ -17,7 +17,7 @@ int	check_philosopher_death(t_ph *ph, uint64_t last_meal)
 	return (0);
 }
 
-int	check_death_during_sleep(t_ph *ph)
+int	check_death_during_action(t_ph *ph)
 {
 	uint64_t	time_since_meal;
 

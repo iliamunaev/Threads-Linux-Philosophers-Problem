@@ -6,7 +6,7 @@
 /*   By: imunaev- <imunaev-@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 00:04:08 by imunaev-          #+#    #+#             */
-/*   Updated: 2025/02/19 18:49:05 by imunaev-         ###   ########.fr       */
+/*   Updated: 2025/02/20 07:23:38 by imunaev-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ size_t		right(t_ph *ph);
 void	cleanup_exit(t_sim **sim, t_ph **ph, int status);
 t_ph		*init_ph(t_sim *sim, char **av);
 t_sim		*init_sim(char **av);
-int			check_death_during_sleep(t_ph *ph);
+int			check_death_during_action(t_ph *ph);
 int			check_philosopher_death(t_ph *ph, uint64_t last_meal);
 int			go_sleep(t_ph *ph);
 int			eat(t_ph *ph);
