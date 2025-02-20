@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   think.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imunaev- <imunaev-@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: imunaev- <imunaev-@studen.hive.fi>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/19 17:26:34 by imunaev-          #+#    #+#             */
-/*   Updated: 2025/02/19 17:26:35 by imunaev-         ###   ########.fr       */
+/*   Updated: 2025/02/20 13:43:37 by imunaev-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void think(t_ph *ph)
+void	think(t_ph *ph)
 {
 	log_action(ph, "is thinking");
 	usleep(100);

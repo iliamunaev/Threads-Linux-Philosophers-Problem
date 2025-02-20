@@ -17,7 +17,7 @@ static int	perform_cycle(t_ph *ph)
 	return (0);
 }
 
-void	*philosopher(void *arg)
+void	*philo(void *arg)
 {
 	t_ph	*ph;
 

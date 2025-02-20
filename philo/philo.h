@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imunaev- <imunaev-@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: imunaev- <imunaev-@studen.hive.fi>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 00:04:08 by imunaev-          #+#    #+#             */
-/*   Updated: 2025/02/20 08:01:08 by imunaev-         ###   ########.fr       */
+/*   Updated: 2025/02/20 13:45:08 by imunaev-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ typedef struct s_sim
 
 typedef struct s_ph
 {
-	size_t	index;
+	size_t		index;
 	uint64_t	last_meal_time;
 	long		time_to_die;
 	long		time_to_eat;
@@ -47,7 +47,7 @@ typedef struct s_ph
 bool		is_input_valid(int ac, char **av);
 long		ft_atol(const char *str);
 void		print_err(char *msg);
-void		*philosopher(void *arg);
+void		*philo(void *arg);
 void		think(t_ph *ph);
 int			eat(t_ph *ph);
 int			go_sleep(t_ph *ph);

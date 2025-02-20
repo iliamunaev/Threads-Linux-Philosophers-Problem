@@ -8,9 +8,9 @@ static int	create_philo_threads(t_sim *sim, t_ph *ph)
 	i = 0;
 	while (i < sim->ph_count)
 	{
-		if (pthread_create(&sim->ph_threads[i], NULL, &philosopher, &ph[i]) != 0)
+		if (pthread_create(&sim->ph_threads[i], NULL, &philo, &ph[i]) != 0)
 		{
-			print_err("Error: main() pthread_create philosopher failed.");
+			print_err("Error: main() pthread_create philo failed.");
 			j = 0;
 			while (j < i)
 			{

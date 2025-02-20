@@ -34,7 +34,7 @@ bool	is_input_valid(int ac, char **av)
 
 	if (ac < 5 || ac > 6)
 	{
-		print_err("Usage: ./philo num_philos time_to_die time_for_eat time_for_sleep [num_meals_to_eat]");
+		print_err("Usage: ./philo philos die_t eat_t sleep_t [num_meals]");
 		return (false);
 	}
 	i = 1;
@@ -57,7 +57,7 @@ uint64_t	get_timestamp(void)
 
 	if (gettimeofday(&tv, NULL) != 0)
 		return (0);
-	return ((uint64_t)tv.tv_sec * 1000ULL) + (tv.tv_usec / 1000ULL);
+	return (((uint64_t)tv.tv_sec * 1000ULL) + (tv.tv_usec / 1000ULL));
 }
 
 void	log_action(t_ph *ph, const char *msg)

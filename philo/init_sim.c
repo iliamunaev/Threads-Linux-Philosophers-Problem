@@ -19,9 +19,9 @@ static t_sim	*alloc_sim_struct(char **av)
 
 static int	init_main_mutexes(t_sim *sim)
 {
-	if (pthread_mutex_init(&sim->mtx_is_dead, NULL) != 0 ||
-		pthread_mutex_init(&sim->mtx_log, NULL) != 0 ||
-		pthread_mutex_init(&sim->mtx_last_meal_time, NULL) != 0)
+	if (pthread_mutex_init(&sim->mtx_is_dead, NULL) != 0
+		|| pthread_mutex_init(&sim->mtx_log, NULL) != 0
+		||	pthread_mutex_init(&sim->mtx_last_meal_time, NULL) != 0)
 	{
 		print_err("Error: init_sim() could not init a main mutex.");
 		return (EXIT_FAILURE);
