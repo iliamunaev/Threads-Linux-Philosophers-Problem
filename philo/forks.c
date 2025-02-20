@@ -2,84 +2,55 @@
 
 static int	take_single_fork(t_ph *ph)
 {
-	pthread_mutex_lock(&ph->sim->mtx_forks[left(ph)]);
+	pthread_mutex_lock(&ph->sim->mtx_forks[ph->index]);
 	log_action(ph, "has taken a fork");
 	usleep(ph->time_to_die * 1000);
-	pthread_mutex_unlock(&ph->sim->mtx_forks[left(ph)]);
+	pthread_mutex_unlock(&ph->sim->mtx_forks[ph->index]);
+	pthread_mutex_lock(&ph->sim->mtx_is_dead);
+	if (!ph->sim->all_dead && !ph->is_dead)
+	{
+		ph->sim->all_dead = true;
+		ph->is_dead = true;
+		pthread_mutex_unlock(&ph->sim->mtx_is_dead);
+		log_action(ph, "died");
+	}
+	else
+		pthread_mutex_unlock(&ph->sim->mtx_is_dead);
 	return (-1);
 }
 
-static int	lock_fork(pthread_mutex_t *fork_mutex, t_ph *ph)
+int take_forks(t_ph *ph)
 {
-	if (pthread_mutex_lock(fork_mutex) == 0)
-	{
-		log_action(ph, "has taken a fork");
-		return (1);
-	}
+	if (ph->sim->ph_count == 1)
+		return (take_single_fork(ph));
+	if (ph->index % 2 == 0)
+		usleep(1000);
+	pthread_mutex_lock(&ph->sim->mtx_forks[left(ph)]);
+	log_action(ph, "has taken a fork");
+	pthread_mutex_lock(&ph->sim->mtx_forks[right(ph)]);
+	log_action(ph, "has taken a fork");
 	return (0);
 }
 
-static int	take_forks_even(t_ph *ph)
-{
-	if (!lock_fork(&ph->sim->mtx_forks[left(ph)], ph))
-		return (0);
-	if (!lock_fork(&ph->sim->mtx_forks[right(ph)], ph))
-	{
-		pthread_mutex_unlock(&ph->sim->mtx_forks[left(ph)]);
-		return (0);
-	}
-	return (1);
-}
 
-static int	take_forks_odd(t_ph *ph)
+void put_forks(t_ph *ph)
 {
-	if (!lock_fork(&ph->sim->mtx_forks[right(ph)], ph))
-		return (0);
-	if (!lock_fork(&ph->sim->mtx_forks[left(ph)], ph))
-	{
-		pthread_mutex_unlock(&ph->sim->mtx_forks[right(ph)]);
-		return (0);
-	}
-	return (1);
-}
+	int	left_id;
+	int	right_id;
 
-int	take_forks(t_ph *ph)
-{
 	if (ph->sim->ph_count == 1)
 	{
-		take_single_fork(ph);
-		return (check_death_during_action(ph));		
+		pthread_mutex_unlock(&ph->sim->mtx_forks[ph->index]);
+		return ;
 	}
-	if (ph->index % 2 == 0)
+	left_id = left(ph);
+	right_id = right(ph);
+	if (left_id > right_id)
 	{
-		if (!take_forks_even(ph))
-			return (0);
+		int tmp = left_id;
+		left_id = right_id;
+		right_id = tmp;
 	}
-	else
-	{
-		think(ph);
-		if (!take_forks_odd(ph))
-			return (0);
-	}
-	return (1);
+	pthread_mutex_unlock(&ph->sim->mtx_forks[right_id]);
+	pthread_mutex_unlock(&ph->sim->mtx_forks[left_id]);
 }
-
-void	put_forks(t_ph *ph)
-{
-	if (ph->sim->ph_count == 1)
-	{
-		pthread_mutex_unlock(&ph->sim->mtx_forks[left(ph)]);
-		return;
-	}
-	if (ph->index % 2 == 0)
-	{
-		pthread_mutex_unlock(&ph->sim->mtx_forks[right(ph)]);
-		pthread_mutex_unlock(&ph->sim->mtx_forks[left(ph)]);
-	}
-	else
-	{
-		pthread_mutex_unlock(&ph->sim->mtx_forks[left(ph)]);
-		pthread_mutex_unlock(&ph->sim->mtx_forks[right(ph)]);
-	}
-}
-

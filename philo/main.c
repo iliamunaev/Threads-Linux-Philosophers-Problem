@@ -2,8 +2,8 @@
 
 static int	create_philo_threads(t_sim *sim, t_ph *ph)
 {
-	long	i;
-	long	j;
+	int	i;
+	int	j;
 
 	i = 0;
 	while (i < sim->ph_count)
@@ -27,21 +27,21 @@ static int	create_philo_threads(t_sim *sim, t_ph *ph)
 
 static int	join_philo_threads(t_sim *sim)
 {
-	long	i;
+	int	i;
 
 	i = 0;
 	while (i < sim->ph_count)
 	{
-		printf("[DEBUG] Joining philosopher thread %ld...\n", i + 1);
+		// printf("[DEBUG] Joining philosopher thread %d...\n", i + 1);
 		if (pthread_join(sim->ph_threads[i], NULL) != 0)
 		{
 			print_err("Error: main() pthread_join failed.");
 			return (EXIT_FAILURE);
 		}
-		printf("[DEBUG] join_philo_threads() Philosopher thread %ld joined successfully.\n", i + 1);
+		// printf("[DEBUG] join_philo_threads() Philosopher thread %d joined successfully.\n", i + 1);
 		i++;
 	}
-	printf("[DEBUG] join_philo_threads() ALL success Philosopher exit successfully.\n");
+	// printf("[DEBUG] join_philo_threads() ALL success Philosopher exit successfully.\n");
 
 	return (EXIT_SUCCESS);
 }

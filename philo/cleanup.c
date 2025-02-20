@@ -14,7 +14,7 @@ static void	destroy_mutexes(t_sim *sim)
 
 static void	destroy_forks(t_sim *sim)
 {
-	long	i;
+	int	i;
 
 	if (!sim->mtx_forks)
 		return ;

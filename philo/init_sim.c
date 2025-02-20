@@ -1,11 +1,11 @@
 #include "philo.h"
 
-long	*init_meal_count(t_sim *sim)
+int	*init_meal_count(t_sim *sim)
 {
-	long	*meal_arr;
-	long	i;
+	int	*meal_arr;
+	int	i;
 
-	meal_arr = malloc(sim->ph_count * sizeof(long));
+	meal_arr = malloc(sim->ph_count * sizeof(int));
 	if (!meal_arr)
 		return (NULL);
 	i = 0;
@@ -36,16 +36,14 @@ static t_sim	*alloc_sim_struct(char **av)
 	{
 		sim->num_meals_to_eat = ft_atol(av[5]);
 		sim->meal_count = init_meal_count(sim);
-		if (!sim->meal_count) // Check if allocation failed
+		if (!sim->meal_count)
 		{
 			print_err("Error: malloc of meal_count failed.");
 			return (NULL);
 		}
 	}
 	else
-	{
 		sim->num_meals_to_eat = -1;
-	}
 	sim->ph_threads = NULL;
 	return (sim);
 }
@@ -65,7 +63,7 @@ static int	init_main_mutexes(t_sim *sim)
 
 static int	init_fork_mutexes(t_sim *sim)
 {
-	long	i;
+	int	i;
 
 	i = 0;
 	while (i < sim->ph_count)

@@ -1,6 +1,6 @@
 #include "philo.h"
 
-static int	fill_ph_data(t_ph *ph, t_sim *sim, char **av, long i)
+static int	fill_ph_data(t_ph *ph, t_sim *sim, char **av, int i)
 {
 	uint64_t	time;
 
@@ -23,8 +23,8 @@ static int	fill_ph_data(t_ph *ph, t_sim *sim, char **av, long i)
 
 t_ph	*init_ph(t_sim *sim, char **av)
 {
-	long	ph_count;
-	long	i;
+	int	ph_count;
+	int	i;
 	t_ph	*ph;
 
 	ph_count = sim->ph_count;

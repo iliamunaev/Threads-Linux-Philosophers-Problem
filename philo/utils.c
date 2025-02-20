@@ -1,9 +1,9 @@
 #include "philo.h"
 
-long	ft_atol(const char *str)
+int	ft_atol(const char *str)
 {
-	long	result;
-	long	sign;
+	int	result;
+	int	sign;
 
 	result = 0;
 	sign = 1;
@@ -30,7 +30,7 @@ void	print_err(char *msg)
 bool	is_input_valid(int ac, char **av)
 {
 	int		i;
-	long	val;
+	int	val;
 
 	if (ac < 5 || ac > 6)
 	{
@@ -66,7 +66,7 @@ void	log_action(t_ph *ph, const char *msg)
 
 	time = get_timestamp();
 	pthread_mutex_lock(&ph->sim->mtx_log);
-	printf("%llu %zu %s\n", (unsigned long long)time, ph->index + 1, msg);
+	printf("%u %zu %s\n", (unsigned int)time, ph->index + 1, msg);
 	pthread_mutex_unlock(&ph->sim->mtx_log);
 }
 
