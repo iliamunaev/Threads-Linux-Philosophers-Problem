@@ -1,57 +1,66 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: imunaev- <imunaev-@student.hive.fi>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/21 19:13:45 by imunaev-          #+#    #+#             */
+/*   Updated: 2025/02/21 19:37:01 by imunaev-         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
-/*
-** Simple custom atoi with basic overflow checks for positive values.
-*/
-static int ft_atoi(const char *str)
+/**
+ * @brief Frees allocated memory for program data.
+ *
+ * This function deallocates memory used for storing philosopher structures
+ * and mutexes if they were allocated. It ensures that no memory leaks occur
+ * when the program terminates.
+ *
+ * @param data A pointer to the program's data structure.
+ * @return void This function does not return a value.
+ */
+void	free_all(t_data *data)
 {
-	long	res = 0;
-	int		i = 0;
-
-	while ((str[i] >= 9 && str[i] <= 13) || str[i] == ' ')
-		i++;
-	while (str[i] >= '0' && str[i] <= '9')
-	{
-		res = res * 10 + (str[i] - '0');
-		if (res > 2147483647)
-			return (-1);
-		i++;
-	}
-	return ((int)res);
+	if (data->forks)
+		free(data->forks);
+	if (data->philo)
+		free(data->philo);
 }
 
-/*
-** Parse command-line arguments into the data struct.
-*/
-int parse_args(int argc, char **argv, t_data *data)
+/**
+ * @brief Compares two strings lexicographically.
+ *
+ * This function compares the strings `s1` and `s2` character by character.
+ * It returns an integer indicating the difference between the first
+ * non-matching characters.
+ *
+ * @param s1 The first string to compare.
+ * @param s2 The second string to compare.
+ * @return int A negative value if `s1` is lexicographically smaller than `s2`,
+ *         zero if they are equal, and a positive value if `s1` is greater.
+ */
+int	ft_strcmp(char *s1, char *s2)
 {
-	if (argc < 5 || argc > 6)
+	while (*s1 && *s1 == *s2)
 	{
-		printf("Error: wrong number of arguments.\n");
-		return (1);
+		s1++;
+		s2++;
 	}
-	data->nb_philo = ft_atoi(argv[1]);
-	data->time_to_die = ft_atoi(argv[2]);
-	data->time_to_eat = ft_atoi(argv[3]);
-	data->time_to_sleep = ft_atoi(argv[4]);
-	data->must_eat_count = -1;
-	if (argc == 6)
-		data->must_eat_count = ft_atoi(argv[5]);
-
-	if (data->nb_philo < 1 || data->time_to_die < 1
-		|| data->time_to_eat < 1 || data->time_to_sleep < 1
-		|| (argc == 6 && data->must_eat_count < 1))
-	{
-		printf("Error: invalid arguments.\n");
-		return (1);
-	}
-	return (0);
+	return (*s1 - *s2);
 }
 
-/*
-** Return current time in ms.
-*/
-long get_time(void)
+/**
+ * @brief Retrieves the current time in milliseconds.
+ *
+ * This function uses `gettimeofday` to obtain the current system time,
+ * converts it into milliseconds, and returns the result.
+ *
+ * @return long The current time in milliseconds.
+ */
+long	get_time(void)
 {
 	struct timeval	tv;
 	long			ms;
@@ -61,12 +70,21 @@ long get_time(void)
 	return (ms);
 }
 
-/*
-** A custom "sleep" that spins in tiny increments to achieve ms precision.
-*/
-void acting(long time_in_ms)
+/**
+ * @brief Causes a delay for a specified amount of time.
+ *
+ * This function makes the program wait for the specified duration in milliseconds.
+ * It continuously checks the elapsed time using `get_time()` and `usleep(100)`
+ * to avoid excessive CPU usage.
+ *
+ * @param time_in_ms The time to wait in milliseconds.
+ * @return void This function does not return a value.
+ */
+void	acting(long time_in_ms)
 {
-	long start = get_time();
+	long	start;
+
+	start = get_time();
 	while ((get_time() - start) < time_in_ms)
 		usleep(100);
 }

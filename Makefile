@@ -1,21 +1,30 @@
+
 NAME = philo
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -g -fsanitize=thread
+CFLAGS = -Wall -Wextra -Werror -pthread #-fsanitize=thread -g
+#-fsanitize=thread -g
 
-SRCS = main.c init.c utils.c routine.c
-OBJS = $(SRCS:.c=.o)
+SRC = $(wildcard *.c)
+OBJ_DIR = obj
+OBJ = $(patsubst %.c,$(OBJ_DIR)/%.o,$(SRC))
 
 all: $(NAME)
 
-$(NAME): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
+$(NAME): $(OBJ)
+	$(CC) $(CFLAGS) -o $(NAME) $(OBJ)
 
-%.o: %.c philo.h
+debug: CFLAGS += -g
+debug: re
+
+$(OBJ_DIR)/%.o: %.c philo.h | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)
+
 clean:
-	rm -f $(OBJS)
+	rm -rf $(OBJ_DIR)
 
 fclean: clean
 	rm -f $(NAME)
