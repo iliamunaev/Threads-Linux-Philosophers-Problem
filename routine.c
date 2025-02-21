@@ -6,7 +6,7 @@
 /*   By: imunaev- <imunaev-@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/21 19:13:31 by imunaev-          #+#    #+#             */
-/*   Updated: 2025/02/21 19:41:27 by imunaev-         ###   ########.fr       */
+/*   Updated: 2025/02/21 20:49:06 by imunaev-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,7 +128,7 @@ void	check_dead(t_data *data)
 			i++;
 		}
 		pthread_mutex_unlock(&data->mtx_global);
-		usleep(1000);
+		usleep(9000);
 	}
 }
 
@@ -152,7 +152,7 @@ void	*routine(void *void_philo)
 	d = philo->data;
 	print_action(d, philo->id, "is thinking");
 	if (philo->id % 2 == 0)
-		usleep(100);
+		usleep(1000);
 	while (1)
 	{
 		if (is_died(d))
@@ -163,6 +163,7 @@ void	*routine(void *void_philo)
 		print_action(d, philo->id, "is sleeping");
 		acting(d->time_to_sleep);
 		print_action(d, philo->id, "is thinking");
+		usleep(9000);
 	}
 	return (NULL);
 }
