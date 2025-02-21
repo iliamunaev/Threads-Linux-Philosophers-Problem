@@ -47,7 +47,7 @@ int   init_all(t_data *data);
 
 // Time & Sleep
 long  get_time(void);
-void  my_sleep(long time_in_ms);
+void  acting(long time_in_ms);
 
 // Routine & Threads
 void  *routine(void *void_philo);

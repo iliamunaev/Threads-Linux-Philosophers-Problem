@@ -64,7 +64,7 @@ long get_time(void)
 /*
 ** A custom "sleep" that spins in tiny increments to achieve ms precision.
 */
-void my_sleep(long time_in_ms)
+void acting(long time_in_ms)
 {
 	long start = get_time();
 	while ((get_time() - start) < time_in_ms)
