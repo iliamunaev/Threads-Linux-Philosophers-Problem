@@ -24,9 +24,9 @@ int init_all(t_data *data)
 	}
 
 	// Initialize the printing and meal checking mutex
-	if (pthread_mutex_init(&data->print_mutex, NULL) != 0)
+	if (pthread_mutex_init(&data->mtx_print, NULL) != 0)
 		return (1);
-	if (pthread_mutex_init(&data->meal_check_mutex, NULL) != 0)
+	if (pthread_mutex_init(&data->mtx_global, NULL) != 0)
 		return (1);
 
 	// Allocate philosophers

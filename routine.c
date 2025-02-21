@@ -1,21 +1,25 @@
 #include "philo.h"
 
-/*
-** Printing function, wraps a mutex lock so that no two messages overlap.
-*/
+
 void print_action(t_data *data, int id, char *str)
 {
-	long timestamp;
+    int local_died;
 
-	pthread_mutex_lock(&data->print_mutex);
-	if (!data->died)
-	{
-		timestamp = get_time() - data->start_time;
-		// Philosophers are 1-based in the output
-		printf("%ld %d %s\n", timestamp, id + 1, str);
-	}
-	pthread_mutex_unlock(&data->print_mutex);
+    // 🔒 Lock global mutex before reading `died`
+    // pthread_mutex_lock(&data->mtx_global);
+    local_died = data->died;
+    // pthread_mutex_unlock(&data->mtx_global);
+
+    if (local_died)
+        return;  // Stop printing if someone is dead
+
+    pthread_mutex_lock(&data->mtx_print);
+    long timestamp = get_time() - data->start_time;
+    printf("%ld %d %s\n", timestamp, id + 1, str);
+    pthread_mutex_unlock(&data->mtx_print);
 }
+
+
 
 /*
 ** Helper for a philosopher to pick up the two forks and eat.
@@ -23,6 +27,7 @@ void print_action(t_data *data, int id, char *str)
 static void eat(t_philo *philo)
 {
 	t_data *d = philo->data;
+
 
 	// The order of locking forks often helps avoid deadlocks:
 	// to reduce jitter, we lock left first for odd IDs, right first for even, etc.
@@ -45,11 +50,11 @@ static void eat(t_philo *philo)
 	}
 
 	// Eat
-	pthread_mutex_lock(&d->meal_check_mutex);
+	pthread_mutex_lock(&d->mtx_global);
 	print_action(d, philo->id, "is eating");
 	philo->last_meal = get_time();
 	philo->eat_count++;
-	pthread_mutex_unlock(&d->meal_check_mutex);
+	pthread_mutex_unlock(&d->mtx_global);
 
 	my_sleep(d->time_to_eat);
 
@@ -59,86 +64,79 @@ static void eat(t_philo *philo)
 		pthread_mutex_unlock(&d->forks[(philo->id + 1) % d->nb_philo]);
 }
 
-/*
-** The main routine each philosopher thread runs.
-*/
 void *routine(void *void_philo)
 {
-	t_philo *philo = (t_philo *)void_philo;
-	t_data  *d = philo->data;
+    t_philo *philo = (t_philo *)void_philo;
+    t_data  *d = philo->data;
 
-	// Special case: if only 1 philosopher, he'll never get a second fork => dies
-	if (d->nb_philo == 1)
-	{
-		pthread_mutex_lock(&d->forks[philo->id]);
-		print_action(d, philo->id, "has taken a fork");
-		my_sleep(d->time_to_die);
-		print_action(d, philo->id, "died");
-		pthread_mutex_unlock(&d->forks[philo->id]);
-		d->died = 1;
-		return (NULL);
-	}
-	
-	print_action(d, philo->id, "is thinking");
+    print_action(d, philo->id, "is thinking");
 
-	// Small offset for even philosopher to reduce forks collision at start
-	if (philo->id % 2 == 0)
-		usleep(100);
+    if (philo->id % 2 == 0)
+        usleep(100);
 
-	while (!d->died)
-	{
-		// Eat
-		eat(philo);
-		if (d->must_eat_count != -1 && philo->eat_count >= d->must_eat_count)
-			break ;
+    while (1)
+    {
+        pthread_mutex_lock(&d->mtx_global);
+        if (d->died)
+        {
+            pthread_mutex_unlock(&d->mtx_global);
+            break;
+        }
+        pthread_mutex_unlock(&d->mtx_global);
 
-		// Sleep
-		print_action(d, philo->id, "is sleeping");
-		my_sleep(d->time_to_sleep);
+        eat(philo);
 
-		// Think
-		print_action(d, philo->id, "is thinking");
-	}
-	return (NULL);
+        pthread_mutex_lock(&d->mtx_global);
+        if (d->must_eat_count != -1 && philo->eat_count >= d->must_eat_count)
+        {
+            pthread_mutex_unlock(&d->mtx_global);
+            break;
+        }
+        pthread_mutex_unlock(&d->mtx_global);
+
+        print_action(d, philo->id, "is sleeping");
+        my_sleep(d->time_to_sleep);
+        print_action(d, philo->id, "is thinking");
+    }
+    return NULL;
 }
-
-/*
-** A loop in the main thread that regularly checks if someone died
-** or if everyone finished eating enough times.
-*/
 void check_dead(t_data *data)
 {
-	while (!data->died)
-	{
-		int i = 0;
-		while (i < data->nb_philo && !data->died)
-		{
-			pthread_mutex_lock(&data->meal_check_mutex);
-			// If time since last meal exceeds time_to_die, he dies
-			if ((get_time() - data->philo[i].last_meal) > data->time_to_die)
-			{
-				print_action(data, i, "died");
-				data->died = 1;
-			}
-			pthread_mutex_unlock(&data->meal_check_mutex);
+    while (1)
+    {
+        pthread_mutex_lock(&data->mtx_global);
+        if (data->died)
+        {
+            pthread_mutex_unlock(&data->mtx_global);
+            break;
+        }
 
-			// Check if everyone ate enough times
-			if (data->must_eat_count != -1)
-			{
-				int j = 0;
-				int finished = 1;
-				while (j < data->nb_philo)
-				{
-					if (data->philo[j].eat_count < data->must_eat_count)
-						finished = 0;
-					j++;
-				}
-				if (finished)
-					data->died = 1;
-			}
-			i++;
-		}
-		if (!data->died)
-			usleep(1000);
-	}
+        int i = 0;
+        int finished = 1;
+        while (i < data->nb_philo && !data->died)
+        {
+            long now = get_time();
+
+            if ((now - data->philo[i].last_meal) > data->time_to_die)
+            {
+                // ✅ Lock before writing `died`
+                data->died = 1;
+
+                pthread_mutex_unlock(&data->mtx_global);
+                print_action(data, i, "died");
+                return;
+            }
+
+            if (data->must_eat_count != -1 && data->philo[i].eat_count < data->must_eat_count)
+                finished = 0;
+
+            i++;
+        }
+
+        if (!data->died && data->must_eat_count != -1 && finished)
+            data->died = 1;  // ✅ Lock before writing `died`
+
+        pthread_mutex_unlock(&data->mtx_global);
+        usleep(1000);
+    }
 }

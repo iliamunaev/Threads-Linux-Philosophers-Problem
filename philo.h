@@ -31,8 +31,8 @@ typedef struct s_data
 	long            start_time;      // Timestamp when the simulation started
 
 	pthread_mutex_t *forks;          // Array of mutexes, one per fork
-	pthread_mutex_t print_mutex;     // Mutex for printing
-	pthread_mutex_t meal_check_mutex;// Mutex for checking/updating last_meal and eat_count
+	pthread_mutex_t mtx_print;     // Mutex for printing
+	pthread_mutex_t mtx_global;// Mutex for checking/updating last_meal and eat_count
 
 	t_philo         *philo;          // Array of philosopher structs
 }	t_data;

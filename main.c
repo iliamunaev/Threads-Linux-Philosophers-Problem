@@ -79,8 +79,8 @@ int main(int argc, char **argv)
 	i = 0;
 	while (i < data.nb_philo)
 		pthread_mutex_destroy(&data.forks[i++]);
-	pthread_mutex_destroy(&data.print_mutex);
-	pthread_mutex_destroy(&data.meal_check_mutex);
+	pthread_mutex_destroy(&data.mtx_print);
+	pthread_mutex_destroy(&data.mtx_global);
 	free_all(&data);
 	return (0);
 }
