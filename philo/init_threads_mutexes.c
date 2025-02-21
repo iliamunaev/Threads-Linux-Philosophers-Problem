@@ -6,7 +6,7 @@
 /*   By: imunaev- <imunaev-@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 23:37:54 by imunaev-          #+#    #+#             */
-/*   Updated: 2025/02/20 23:41:52 by imunaev-         ###   ########.fr       */
+/*   Updated: 2025/02/21 09:15:56 by imunaev-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,8 @@ int	init_main_mutexes(t_sim *sim)
 	if (pthread_mutex_init(&sim->mtx_is_dead, NULL) != 0
 		|| pthread_mutex_init(&sim->mtx_log, NULL) != 0
 		|| pthread_mutex_init(&sim->mtx_last_meal_time, NULL) != 0
-		|| pthread_mutex_init(&sim->mtx_meal_count, NULL) != 0)
+		|| pthread_mutex_init(&sim->mtx_meal_count, NULL) != 0
+		|| pthread_mutex_init(&sim->mtx_host, NULL) != 0)
 	{
 		print_err("Error: init_sim() could not init a main mutex.");
 		return (EXIT_FAILURE);

@@ -6,7 +6,7 @@
 /*   By: imunaev- <imunaev-@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 23:19:47 by imunaev-          #+#    #+#             */
-/*   Updated: 2025/02/20 23:56:25 by imunaev-         ###   ########.fr       */
+/*   Updated: 2025/02/21 08:53:11 by imunaev-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,11 +62,12 @@ int	main(int ac, char **av)
 	if (!is_input_valid(ac, av))
 		return (EXIT_FAILURE);
 	sim = init_sim(av);
+
 	if (!sim)
 		exit(EXIT_FAILURE);
 	ph = init_ph(sim, av);
 	if (!ph)
-		cleanup_exit(&sim, NULL, EXIT_FAILURE);
+	cleanup_exit(&sim, NULL, EXIT_FAILURE);
 	if (create_philo_threads(sim, ph) == EXIT_FAILURE)
 		cleanup_exit(&sim, &ph, EXIT_FAILURE);
 	if (av[5])

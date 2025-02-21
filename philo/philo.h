@@ -6,7 +6,7 @@
 /*   By: imunaev- <imunaev-@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 00:04:08 by imunaev-          #+#    #+#             */
-/*   Updated: 2025/02/20 23:41:25 by imunaev-         ###   ########.fr       */
+/*   Updated: 2025/02/21 09:14:09 by imunaev-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,8 @@ typedef struct s_sim
 	bool			all_satiated;
 	int				num_meals_to_eat;
 	int				*meal_count;
+	int             active_eaters;   // How many philosophers are currently eating
+    pthread_mutex_t mtx_host;        // Protects active_eaters
 	pthread_t		*ph_threads;
 	pthread_t		monitor_thread;
 	pthread_mutex_t	*mtx_forks;

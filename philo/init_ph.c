@@ -6,7 +6,7 @@
 /*   By: imunaev- <imunaev-@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 23:19:25 by imunaev-          #+#    #+#             */
-/*   Updated: 2025/02/20 23:57:17 by imunaev-         ###   ########.fr       */
+/*   Updated: 2025/02/21 08:43:39 by imunaev-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,8 @@ t_ph	*init_ph(t_sim *sim, char **av)
 	t_ph	*ph;
 
 	ph_count = sim->ph_count;
-	// ph = malloc(ph_count * sizeof(t_ph));
-	ph = NULL;
+	ph = malloc(ph_count * sizeof(t_ph));
+	// ph = NULL;
 	if (!ph)
 	{
 		print_err("Error: init_ph() malloc failed.");

@@ -6,7 +6,7 @@
 /*   By: imunaev- <imunaev-@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 23:16:15 by imunaev-          #+#    #+#             */
-/*   Updated: 2025/02/20 23:16:20 by imunaev-         ###   ########.fr       */
+/*   Updated: 2025/02/21 09:54:13 by imunaev-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ static int	perform_cycle(t_ph *ph)
 		return (-1);
 	if (go_sleep(ph) == -1)
 		return (-1);
-	think(ph);
+	// think(ph);
 	return (0);
 }
 

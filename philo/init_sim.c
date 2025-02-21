@@ -6,7 +6,7 @@
 /*   By: imunaev- <imunaev-@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/20 23:37:44 by imunaev-          #+#    #+#             */
-/*   Updated: 2025/02/20 23:57:01 by imunaev-         ###   ########.fr       */
+/*   Updated: 2025/02/21 09:16:20 by imunaev-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ static int	setup_meal_count(t_sim *sim, char **av)
 {
 	if (!av[5])
 	{
+
 		sim->num_meals_to_eat = -1;
 		return (0);
 	}
@@ -44,7 +45,7 @@ static int	setup_meal_count(t_sim *sim, char **av)
 		print_err("Error: malloc of meal_count failed.");
 		return (EXIT_FAILURE);
 	}
-	return (EXIT_FAILURE);
+	return (EXIT_SUCCESS);
 }
 
 static void	init_sim_defaults(t_sim *sim, char **av)
@@ -55,6 +56,7 @@ static void	init_sim_defaults(t_sim *sim, char **av)
 	sim->mtx_forks = NULL;
 	sim->meal_count = NULL;
 	sim->ph_threads = NULL;
+	sim->active_eaters = 0;
 }
 
 static t_sim	*alloc_sim_struct(char **av)
@@ -79,7 +81,7 @@ t_sim	*init_sim(char **av)
 
 	sim = alloc_sim_struct(av);
 	if (!sim)
-		return (NULL);
+	return (NULL);
 	if (alloc_forks_and_threads(sim) == EXIT_FAILURE)
 		return (NULL);
 	if (init_main_mutexes(sim) == EXIT_FAILURE)
