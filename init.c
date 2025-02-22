@@ -6,7 +6,7 @@
 /*   By: imunaev- <imunaev-@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/21 19:21:08 by imunaev-          #+#    #+#             */
-/*   Updated: 2025/02/21 19:38:25 by imunaev-         ###   ########.fr       */
+/*   Updated: 2025/02/22 10:11:30 by imunaev-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,8 @@ static int	init_mutexes(t_data *data)
 	if (pthread_mutex_init(&data->mtx_print, NULL) != 0)
 		return (EXIT_FAILURE);
 	if (pthread_mutex_init(&data->mtx_global, NULL) != 0)
+		return (EXIT_FAILURE);
+	if (pthread_mutex_init(&data->mtx_threads, NULL) != 0)
 		return (EXIT_FAILURE);
 	return (EXIT_SUCCESS);
 }
@@ -88,6 +90,7 @@ int	init_all(t_data *data)
 	data->died = 0;
 	data->forks = NULL;
 	data->philo = NULL;
+	data->threads_created = 0;
 	if (init_mutexes(data))
 		return (EXIT_FAILURE);
 	if (init_philos(data))

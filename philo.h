@@ -6,7 +6,7 @@
 /*   By: imunaev- <imunaev-@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/21 19:16:41 by imunaev-          #+#    #+#             */
-/*   Updated: 2025/02/21 19:34:34 by imunaev-         ###   ########.fr       */
+/*   Updated: 2025/02/22 10:10:52 by imunaev-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,9 +37,11 @@ typedef struct s_data
 	int				must_eat_count;  // If >= 0, how many times each philosopher must eat
 	int				died;            // Flag to indicate someone died or sim should stop
 	long			start_time;      // Timestamp when the simulation started
+	int				threads_created;
 	pthread_mutex_t	*forks;          // Array of mutexes, one per fork
 	pthread_mutex_t	mtx_print;     // Mutex for printing
 	pthread_mutex_t	mtx_global;// Mutex for checking/updating last_meal and eat_count
+	pthread_mutex_t mtx_threads; 
 	t_philo			*philo;          // Array of philosopher structs
 }	t_data;
 

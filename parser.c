@@ -6,7 +6,7 @@
 /*   By: imunaev- <imunaev-@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/21 19:12:40 by imunaev-          #+#    #+#             */
-/*   Updated: 2025/02/21 19:34:16 by imunaev-         ###   ########.fr       */
+/*   Updated: 2025/02/21 21:49:28 by imunaev-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,6 +106,5 @@ int	parse_and_init(t_data *data, int argc, char **argv)
 		free_all(data);
 		return (EXIT_FAILURE);
 	}
-	data->start_time = get_time();
 	return (EXIT_SUCCESS);
 }

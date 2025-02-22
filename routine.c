@@ -6,18 +6,49 @@
 /*   By: imunaev- <imunaev-@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/21 19:13:31 by imunaev-          #+#    #+#             */
-/*   Updated: 2025/02/21 20:49:06 by imunaev-         ###   ########.fr       */
+/*   Updated: 2025/02/22 10:22:01 by imunaev-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+/**
+ * @brief Handles the process of taking forks for a philosopher.
+ *
+ * This function ensures that the philosopher takes two forks in a
+ * specific order to avoid deadlocks. If there is only one philosopher,
+ * they take a single fork and wait until they die (as per the classic
+ * philosopher problem).
+ *
+ * @param philo A pointer to the philosopher structure.
+ * @param first_fork The index of the first fork to pick up.
+ * @param second_fork The index of the second fork to pick up.
+ * @return int Returns 0 if successful, otherwise 1 if only one philosopher exists.
+ */
+static int	take_forks(t_philo *philo, int first_fork, int second_fork)
+{
+	t_data	*d;
+
+	d = philo->data;
+	if (d->nb_philo == 1)
+	{
+		pthread_mutex_lock(&d->forks[0]);
+		print_action(d, 0, "has taken a fork");
+		usleep(d->time_to_die * 1000);
+		pthread_mutex_unlock(&d->forks[0]);
+		return (1);
+	}
+	pthread_mutex_lock(&d->forks[first_fork]);
+	print_action(d, philo->id, "has taken a fork 1"); // test
+	pthread_mutex_lock(&d->forks[second_fork]);
+	print_action(d, philo->id, "has taken a fork 2"); // test
+	return (0);
+}
 
 /**
  * @brief Handles the eating process for a philosopher.
  *
- * This function allows a philosopher to take two forks, ensuring that
- * they follow an alternating order to avoid deadlocks. It updates the
- * philosopher's last meal time and increments their meal count. After eating,
+ * This function allows a philosopher to take two forks (using `take_forks`),
+ * update their last meal time, and increment their meal count. After eating,
  * the forks are released.
  *
  * @param philo A pointer to the philosopher structure.
@@ -37,10 +68,8 @@ static void	eat(t_philo *philo)
 		first_fork = (philo->id + 1) % d->nb_philo;
 		second_fork = philo->id;
 	}
-	pthread_mutex_lock(&d->forks[first_fork]);
-	print_action(d, philo->id, "has taken a fork");
-	pthread_mutex_lock(&d->forks[second_fork]);
-	print_action(d, philo->id, "has taken a fork");
+	if (take_forks(philo, first_fork, second_fork))
+		return ;
 	pthread_mutex_lock(&d->mtx_global);
 	philo->last_meal = get_time();
 	philo->eat_count++;
@@ -93,6 +122,26 @@ static int	check_eat_count(t_philo *philo)
 	return (done);
 }
 
+static int	all_philosophers_ate_enough(t_data *data)
+{
+	int	i;
+	int	count;
+
+	if (data->must_eat_count == -1)
+		return (0);
+	i = 0;
+	count = 0;
+	while (i < data->nb_philo)
+	{
+		// Locking if needed when reading shared data
+		pthread_mutex_lock(&data->mtx_global);
+		if (data->philo[i].eat_count >= data->must_eat_count)
+			count++;
+		pthread_mutex_unlock(&data->mtx_global);
+		i++;
+	}
+	return (count == data->nb_philo);
+}
 /**
  * @brief Monitors philosophers to check if any have died.
  *
@@ -109,6 +158,8 @@ void	check_dead(t_data *data)
 
 	while (1)
 	{
+		if (all_philosophers_ate_enough(data))
+			return ;
 		pthread_mutex_lock(&data->mtx_global);
 		if (data->died)
 		{
@@ -123,12 +174,14 @@ void	check_dead(t_data *data)
 				data->died = 1;
 				pthread_mutex_unlock(&data->mtx_global);
 				print_action(data, i, "died");
+				if (data->nb_philo == 1)
+					pthread_mutex_unlock(&data->forks[0]);
 				return ;
 			}
 			i++;
 		}
 		pthread_mutex_unlock(&data->mtx_global);
-		usleep(9000);
+		usleep(100);
 	}
 }
 
@@ -150,6 +203,12 @@ void	*routine(void *void_philo)
 
 	philo = (t_philo *)void_philo;
 	d = philo->data;
+
+	while(d->threads_created == 0)
+		usleep(1000);
+
+	philo->last_meal = d->start_time;
+
 	print_action(d, philo->id, "is thinking");
 	if (philo->id % 2 == 0)
 		usleep(1000);
@@ -163,7 +222,8 @@ void	*routine(void *void_philo)
 		print_action(d, philo->id, "is sleeping");
 		acting(d->time_to_sleep);
 		print_action(d, philo->id, "is thinking");
-		usleep(9000);
+		usleep(1000);
 	}
+
 	return (NULL);
 }
