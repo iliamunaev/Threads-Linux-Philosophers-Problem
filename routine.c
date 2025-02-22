@@ -6,7 +6,7 @@
 /*   By: imunaev- <imunaev-@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/21 19:13:31 by imunaev-          #+#    #+#             */
-/*   Updated: 2025/02/22 10:22:01 by imunaev-         ###   ########.fr       */
+/*   Updated: 2025/02/22 10:31:51 by imunaev-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,8 +174,8 @@ void	check_dead(t_data *data)
 				data->died = 1;
 				pthread_mutex_unlock(&data->mtx_global);
 				print_action(data, i, "died");
-				if (data->nb_philo == 1)
-					pthread_mutex_unlock(&data->forks[0]);
+				// if (data->nb_philo == 1)
+				// 	pthread_mutex_unlock(&data->forks[0]);
 				return ;
 			}
 			i++;
@@ -204,10 +204,18 @@ void	*routine(void *void_philo)
 	philo = (t_philo *)void_philo;
 	d = philo->data;
 
-	while(d->threads_created == 0)
+	while (1)
+	{
+		pthread_mutex_lock(&d->mtx_threads);
+		int ready = d->threads_created;
+		pthread_mutex_unlock(&d->mtx_threads);
+		if (ready)
+			break;
 		usleep(1000);
-
-	philo->last_meal = d->start_time;
+	}
+	pthread_mutex_lock(&d->mtx_global);
+    philo->last_meal = d->start_time;
+    pthread_mutex_unlock(&d->mtx_global);
 
 	print_action(d, philo->id, "is thinking");
 	if (philo->id % 2 == 0)
